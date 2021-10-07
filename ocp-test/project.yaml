@@ -143,6 +143,8 @@ spec:
   selector:
     matchLabels:
       app: annif-app
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -160,6 +162,7 @@ spec:
           name: annif-app
           resources:
             limits:
+              cpu: 2
               memory: 26Gi
           volumeMounts:
             - mountPath: /annif-projects
