@@ -70,8 +70,18 @@ spec:
         - name: matomo-log-analytics
           image: >-
             image-registry.openshift-image-registry.svc:5000/annif/matomo-log-analytics@sha256:d831724ce9d483517bbfcbdb4108e5a5ed265ec57751cdb4043b6d82602802e0
-          command: ["/bin/sh"]
-          args: ["-c", "tail -f /logs/nginx-access.log | python /opt/app-root/src/import_logs.py --url=https://tilasto.lib.helsinki.fi --idsite=12 --token-auth $(MATOMO-TOKEN) --enable-http-errors --enable-http-redirects --enable-static --enable-bots --track-http-method true --recorder-max-payload-size=10 -"]
+          command: ["/bin/sh", "-c"]
+          args:
+            - tail -f /logs/nginx-access.log | python /opt/app-root/src/import_logs.py
+              --url=https://tilasto.lib.helsinki.fi
+              --idsite=15
+              --token-auth $(MATOMO-TOKEN)
+              --enable-http-errors
+              --enable-http-redirects
+              --enable-static
+              --enable-bots
+              --track-http-method true
+              --recorder-max-payload-size=10 -
           env:
             - name: MATOMO-TOKEN
               valueFrom:
