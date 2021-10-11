@@ -4,6 +4,7 @@ kind: ImageStream
 metadata:
   name: ai-finto-fi-nginx
 ---
+
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
@@ -40,6 +41,7 @@ spec:
           image-registry.openshift-image-registry.svc:5000/openshift/nginx@sha256:2878cf2a32e2bd86b8b00c9349e38f652a2952b47a2f891303ea96c7998b7d34
     - type: ConfigChange
 ---
+
 kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
@@ -58,7 +60,6 @@ spec:
           name: 'ai-finto-fi-nginx:latest'
     - type: ConfigChange
   replicas: 1
-  test: false
   selector:
     app: ai-finto-fi-nginx
     deploymentconfig: ai-finto-fi-nginx
@@ -92,11 +93,18 @@ spec:
             - name: nginx-conf
               mountPath: /opt/app-root/etc/nginx.default.d/server-context.conf
               subPath: server-context.conf
+            - name: logs
+              mountPath: /logs
       volumes:
         - name: nginx-conf
           configMap:
             name: nginx-conf
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs
+            readOnly: False
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -107,6 +115,7 @@ spec:
   ports:
   - port: 8080
 ---
+
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -121,8 +130,10 @@ spec:
     kind: Service
     name: nginx
   wildcardPolicy: None
+
 ---
 ### Annif application
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -133,6 +144,7 @@ spec:
   ports:
   - port: 8000
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -175,6 +187,7 @@ spec:
             claimName: model-data
             readOnly: true
 ---
+
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -184,4 +197,15 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 30000Mi
+      storage: 28Gi
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: logs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 0.5Gi  # TODO Increase log volume size?
+
