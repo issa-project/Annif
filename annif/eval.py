@@ -131,6 +131,10 @@ class EvaluationBatch:
                 y_true_sparse,
                 filter_pred_top_k(y_pred, 5) > 0.0,
                 average='samples'),
+             'F1@10': lambda: f1_score(
+                y_true_sparse,
+                filter_pred_top_k(y_pred, 10) > 0.0,
+                average='samples'),
             'NDCG': lambda: ndcg_score(y_true, y_pred),
             'NDCG@5': lambda: ndcg_score(y_true, y_pred, limit=5),
             'NDCG@10': lambda: ndcg_score(y_true, y_pred, limit=10),
